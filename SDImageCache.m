@@ -193,6 +193,32 @@ static SDImageCache *instance;
 
 #pragma mark ImageCache
 
+- (void)storeImage:(UIImage *)image imageData:(NSData *)data forKey:(NSString *)key toMemory:(BOOL)toMemory {
+    if (!image || !key)
+    {
+        return;
+    }
+    
+    if (toMemory) 
+    {
+        [memCache setObject:image forKey:key];
+    }
+    
+    if (!data) return;
+    NSArray *keyWithData;
+    if (data)
+    {
+        keyWithData = [NSArray arrayWithObjects:key, data, nil];
+    }
+    else
+    {
+        keyWithData = [NSArray arrayWithObjects:key, nil];
+    }
+    [cacheInQueue addOperation:[[[NSInvocationOperation alloc] initWithTarget:self
+                                                                     selector:@selector(storeKeyWithDataToDisk:)
+                                                                       object:keyWithData] autorelease]];
+}
+
 - (void)storeImage:(UIImage *)image imageData:(NSData *)data forKey:(NSString *)key toDisk:(BOOL)toDisk
 {
     if (!image || !key)
@@ -223,6 +249,10 @@ static SDImageCache *instance;
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key
 {
     [self storeImage:image imageData:nil forKey:key toDisk:YES];
+}
+
+- (void)storeImage:(UIImage *)image forKey:(NSString *)key toMemory:(BOOL)toMemory {
+    [self storeImage:image imageData:UIImageJPEGRepresentation(image, 1.0) forKey:key toMemory:toMemory];
 }
 
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key toDisk:(BOOL)toDisk
