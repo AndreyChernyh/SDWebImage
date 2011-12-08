@@ -50,12 +50,20 @@ static SDWebImageManager *instance;
     return instance;
 }
 
++ (NSString *)urlToCacheString: (NSURL *)url {
+  if ([[url absoluteString] rangeOfString:@"AWSAccessKeyId"].location == NSNotFound) {
+      return [url absoluteString];
+  } else {
+      return [url path];
+  }
+}
+
 /**
  * @deprecated
  */
 - (UIImage *)imageWithURL:(NSURL *)url
 {
-    return [[SDImageCache sharedImageCache] imageFromKey:[url absoluteString]];
+    return [[SDImageCache sharedImageCache] imageFromKey:[[self class] urlToCacheString:url]];
 }
 
 /**
@@ -100,7 +108,7 @@ static SDWebImageManager *instance;
     [cacheDelegates addObject:delegate];
     [cacheURLs addObject:url];
     NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:delegate, @"delegate", url, @"url", [NSNumber numberWithInt:options], @"options", nil];
-    [[SDImageCache sharedImageCache] queryDiskCacheForKey:[url absoluteString] delegate:self userInfo:info];
+    [[SDImageCache sharedImageCache] queryDiskCacheForKey:[[self class] urlToCacheString:url] delegate:self userInfo:info];
 }
 
 - (void)cancelForDelegate:(id<SDWebImageManagerDelegate>)delegate
@@ -243,7 +251,7 @@ static SDWebImageManager *instance;
         // Store the image in the cache
         [[SDImageCache sharedImageCache] storeImage:image
                                           imageData:downloader.imageData
-                                             forKey:[downloader.url absoluteString]
+                                             forKey:[[self class] urlToCacheString:downloader.url]
                                              toDisk:!(options & SDWebImageCacheMemoryOnly)];
     }
     else if (!(options & SDWebImageRetryFailed))
