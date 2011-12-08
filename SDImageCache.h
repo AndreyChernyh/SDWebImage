@@ -16,6 +16,7 @@
     NSOperationQueue *cacheInQueue, *cacheOutQueue;
 }
 
++ (void)setDiskOnlyCache:(BOOL)v;
 + (SDImageCache *)sharedImageCache;
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key;
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key toDisk:(BOOL)toDisk;

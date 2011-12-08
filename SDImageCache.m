@@ -18,9 +18,15 @@ static NSInteger cacheMaxCacheAge = 60*60*24*7; // 1 week
 
 static SDImageCache *instance;
 
+static BOOL diskOnlyCache = NO;
+
 @implementation SDImageCache
 
 #pragma mark NSObject
+
++ (void)setDiskOnlyCache:(BOOL)v {
+    diskOnlyCache = v;
+}
 
 - (id)init
 {
@@ -226,7 +232,9 @@ static SDImageCache *instance;
         return;
     }
 
-    [memCache setObject:image forKey:key];
+    if (!diskOnlyCache) {
+        [memCache setObject:image forKey:key];
+    }
 
     if (toDisk)
     {
@@ -248,7 +256,11 @@ static SDImageCache *instance;
 
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key
 {
-    [self storeImage:image imageData:nil forKey:key toDisk:YES];
+    if (diskOnlyCache) {
+        [self storeImage:image imageData:UIImageJPEGRepresentation(image, 1.0) forKey:key toMemory:NO];
+    } else {
+        [self storeImage:image imageData:nil forKey:key toDisk:YES];
+    }
 }
 
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key toMemory:(BOOL)toMemory {
@@ -280,7 +292,9 @@ static SDImageCache *instance;
         image = [[[UIImage alloc] initWithContentsOfFile:[self cachePathForKey:key]] autorelease];
         if (image)
         {
-            [memCache setObject:image forKey:key];
+            if (!diskOnlyCache) {
+                [memCache setObject:image forKey:key];
+            }
         }
     }
 
