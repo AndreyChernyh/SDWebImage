@@ -292,8 +292,17 @@ static BOOL diskOnlyCache = NO;
         image = [[[UIImage alloc] initWithContentsOfFile:[self cachePathForKey:key]] autorelease];
         if (image)
         {
+            // Read image from file and set appropriate scale factor.
+            // In other case image will be readed from file on apparing in UI
+            // in main thread that cause apparing slowing.
+            CGRect destRect = CGRectMake(0, 0, image.size.width / [UIScreen mainScreen].scale, image.size.height / [UIScreen mainScreen].scale);
+            UIGraphicsBeginImageContextWithOptions(destRect.size, YES, 0.0);
+            [image drawInRect:destRect];
+            UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+
             if (!diskOnlyCache) {
-                [memCache setObject:image forKey:key];
+                [memCache setObject:newImage forKey:key];
             }
         }
     }
