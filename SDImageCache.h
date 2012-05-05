@@ -28,8 +28,10 @@
 - (void)queryDiskCacheForKey:(NSString *)key delegate:(id <SDImageCacheDelegate>)delegate userInfo:(NSDictionary *)info;
 
 - (void)removeImageForKey:(NSString *)key;
+- (void)removeImageForKey:(NSString *)key fromDisk:(BOOL)fromDisk;
 - (void)clearMemory;
 - (void)clearDisk;
 - (void)cleanDisk;
+- (int)getSize;
 
 @end
