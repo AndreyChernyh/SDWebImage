@@ -30,7 +30,7 @@ static BOOL diskOnlyCache = NO;
     if ((self = [super init]))
     {
         // Init the memory cache
-        memCache = [[NSMutableDictionary alloc] init];
+        memCache = [[NSCache alloc] init];
 
         // Init the disk cache
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);

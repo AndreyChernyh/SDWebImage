@@ -11,7 +11,7 @@
 
 @interface SDImageCache : NSObject
 {
-    NSMutableDictionary *memCache;
+    NSCache *memCache;
     NSString *diskCachePath;
     NSOperationQueue *cacheInQueue, *cacheOutQueue;
 }
