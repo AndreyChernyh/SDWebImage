@@ -10,6 +10,7 @@
 #import "SDWebImageDecoder.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "SDWebImageDecoder.h"
+#import "SDDiskCleaner.h"
 
 static NSInteger cacheMaxCacheAge = 60*60*24*7; // 1 week
 
@@ -35,6 +36,7 @@ static BOOL diskOnlyCache = NO;
         // Init the disk cache
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         diskCachePath = SDWIReturnRetained([[paths objectAtIndex:0] stringByAppendingPathComponent:@"ImageCache"]);
+        [SDDiskCleaner sharedDiskCleaner].diskCachePath = diskCachePath;
 
         if (![[NSFileManager defaultManager] fileExistsAtPath:diskCachePath])
         {
@@ -57,7 +59,7 @@ static BOOL diskOnlyCache = NO;
                                                      name:UIApplicationDidReceiveMemoryWarningNotification
                                                    object:nil];
 
-        [[NSNotificationCenter defaultCenter] addObserver:self
+        [[NSNotificationCenter defaultCenter] addObserver:[SDDiskCleaner sharedDiskCleaner]
                                                  selector:@selector(cleanDisk)
                                                      name:UIApplicationWillTerminateNotification
                                                    object:nil];
@@ -70,6 +72,14 @@ static BOOL diskOnlyCache = NO;
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(clearMemory)
                                                          name:UIApplicationDidEnterBackgroundNotification
+                                                       object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:[SDDiskCleaner sharedDiskCleaner]
+                                                     selector:@selector(cleanDisk)
+                                                         name:UIApplicationDidEnterBackgroundNotification
+                                                       object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:[SDDiskCleaner sharedDiskCleaner]
+                                                     selector:@selector(interrupt)
+                                                         name:UIApplicationWillEnterForegroundNotification
                                                        object:nil];
         }
 #endif
