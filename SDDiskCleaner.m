@@ -8,7 +8,7 @@
 
 #import "SDDiskCleaner.h"
 
-static const NSUInteger kMaxCacheAge = 60*60*24*7; // 1 week
+static const NSInteger kMaxCacheAge = 60*60*24*30; // 30 days
 
 @interface SDDiskCleaner ()
 @property (atomic, retain) NSFileManager *fileManager;
